@@ -57,17 +57,19 @@ const Nav = memo(() => {
       style={{ height: `${dimensions.navHeight}px` }}
     >
       <Logo width={dimensions.logoWidth} height={dimensions.logoHeight} action={handleLogoClick} />
-      <div
-        className="border rounded-full text-center"
-        style={{
-          fontSize: `${dimensions.versionFont}px`,
-          marginLeft: `${dimensions.versionMargin}px`,
-          paddingLeft: '0.3rem',
-          paddingRight: '0.3rem',
-        }}
-      >
-        {isStaticBuild ? 'Static Version' : 'v' + version}
-      </div>
+      {!options.stealthCloak && (
+        <div
+          className="border rounded-full text-center"
+          style={{
+            fontSize: `${dimensions.versionFont}px`,
+            marginLeft: `${dimensions.versionMargin}px`,
+            paddingLeft: '0.3rem',
+            paddingRight: '0.3rem',
+          }}
+        >
+          {isStaticBuild ? 'Static Version' : 'v' + version}
+        </div>
+      )}
       <div className="flex items-center gap-5 ml-auto" style={{ height: 'calc(100% - 0.5rem)' }}>
         <NavItem items={items} />
       </div>
