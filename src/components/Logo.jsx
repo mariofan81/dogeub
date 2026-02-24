@@ -24,6 +24,8 @@ const Logo = memo(({ options, action, width, height }) => {
     [options, action],
   );
 
+  if (op.stealthCloak) return null;
+
   return (
     <img
       src="/logo.svg"

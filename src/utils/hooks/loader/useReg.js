@@ -7,33 +7,38 @@ import store from './useLoaderStore';
 export default function useReg() {
   const { options } = useOptions();
   const ws = `${location.protocol == 'http:' ? 'ws:' : 'wss:'}//${location.host}/wisp/`;
+  const bareServer = `${location.origin}/seal/`;
   const sws = [{ path: '/uv/sw.js' }, { path: '/s_sw.js', scope: '/scramjet/' }];
   const setWispStatus = store((s) => s.setWispStatus);
 
   useEffect(() => {
     const init = async () => {
-      if (!window.scr) {
-        const script = document.createElement('script');
-        script.src = '/scram/scramjet.all.js';
-        await new Promise((resolve, reject) => {
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
+      try {
+        if (!window.scr) {
+          const script = document.createElement('script');
+          script.src = '/scram/scramjet.all.js';
+          await new Promise((resolve, reject) => {
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        const { ScramjetController } = $scramjetLoadController();
+
+        window.scr = new ScramjetController({
+          files: {
+            wasm: '/scram/scramjet.wasm.wasm',
+            all: '/scram/scramjet.all.js',
+            sync: '/scram/scramjet.sync.js',
+          },
+          flags: { rewriterLogs: false, scramitize: false, cleanErrors: true, sourcemaps: true },
         });
+
+        window.scr.init();
+      } catch (err) {
+        console.warn('Scramjet bootstrap failed, UV will still be initialized:', err);
       }
-
-      const { ScramjetController } = $scramjetLoadController();
-
-      window.scr = new ScramjetController({
-        files: {
-          wasm: '/scram/scramjet.wasm.wasm',
-          all: '/scram/scramjet.all.js',
-          sync: '/scram/scramjet.sync.js',
-        },
-        flags: { rewriterLogs: false, scramitize: false, cleanErrors: true, sourcemaps: true },
-      });
-
-      window.scr.init();
 
       for (const sw of sws) {
         try {
@@ -51,16 +56,23 @@ export default function useReg() {
       let socket = isStaticBuild ? await returnWServer() : null;
       isStaticBuild && (!socket ? setWispStatus(false) : setWispStatus(true));
 
-      await connection.setTransport('/libcurl/index.mjs', [
-        {
-          wisp:
-            options.wServer != null && options.wServer !== ''
-              ? options.wServer
-              : isStaticBuild
-                ? socket
-                : ws,
-        },
-      ]);
+      const activeWisp =
+        options.wServer != null && options.wServer !== ''
+          ? options.wServer
+          : isStaticBuild
+            ? socket
+            : ws;
+
+      try {
+        await connection.setTransport('/libcurl/index.mjs', [{ wisp: activeWisp }]);
+      } catch (err) {
+        console.warn('libcurl transport failed, falling back to bare server transport:', err);
+        try {
+          await connection.setTransport('/baremod/index.mjs', [bareServer]);
+        } catch (fallbackErr) {
+          console.error('Failed to initialize bare transports:', fallbackErr);
+        }
+      }
     };
 
     init();

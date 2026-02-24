@@ -65,6 +65,25 @@ export const privacyConfig = ({ options, updateOption, openPanic }) => ({
     action: openPanic,
     disabled: !!!options.panicToggleEnabled,
   },
+  6: {
+    name: 'Stealth Cloak',
+    desc: 'Hide DogeUB branding in the UI and apply a neutral tab identity for safer deployments.',
+    value: !!options.stealthCloak,
+    type: 'switch',
+    action: (enabled) => {
+      const updates = { stealthCloak: enabled };
+
+      if (enabled && (!options.tabName || options.tabName === meta[0].value.tabName)) {
+        updates.tabName = 'Google Docs';
+        updates.tabIcon = 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico';
+      }
+
+      setTimeout(() => {
+        updateOption(updates);
+        import('/src/utils/utils.js').then(({ ckOff }) => ckOff());
+      }, 100);
+    },
+  },
 });
 
 export const customizeConfig = ({ options, updateOption }) => ({

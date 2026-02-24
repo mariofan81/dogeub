@@ -26,8 +26,9 @@ const UpdateDialog = () => {
         >
           <DialogTitle className="text-[1.05rem] mb-1">Important Reminder</DialogTitle>
           <p className="text-sm" style={{ color: options.siteTextColor || '#a0b0c8' }}>
-            DogeUB has just been updated! Please ensure you are up-to-date by clearing your cache in
-            Settings {`>`} Advanced.
+            {options.stealthCloak
+              ? 'The site has just been updated. Please clear your cache in Settings > Advanced.'
+              : 'DogeUB has just been updated! Please ensure you are up-to-date by clearing your cache in Settings > Advanced.'}
           </p>
           <div className="flex justify-end mt-4">
             <Button
