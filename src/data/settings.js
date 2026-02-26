@@ -25,47 +25,6 @@ export const privacyConfig = ({ options, updateOption, openPanic }) => ({
     },
   },
   2: {
-    name: 'Auto Cloak',
-    desc: 'Automatically apply the selected cloak when you switch tabs, restore original when you return.',
-    config: meta,
-    value: !!options.clkOff,
-    type: 'switch',
-    action: (b) => {
-      setTimeout(() => {
-        updateOption({ clkOff: b });
-        import('/src/utils/utils.js').then(({ ckOff }) => ckOff());
-      }, 100);
-    },
-    disabled: !options.tabName || options.tabName == meta[0].value.tabName,
-  },
-  3: {
-    name: 'Open in AB',
-    desc: 'This will open the site into an about:blank tab. Make sure popups are enabled.',
-    value: options.aboutBlank,
-    type: 'switch',
-    action: (b) => setTimeout(() => updateOption({ aboutBlank: b }), 100),
-  },
-  4: {
-    name: 'Panic Key',
-    desc: 'Enable or disable the panic key option.',
-    value: !!options.panicToggleEnabled,
-    type: 'switch',
-    action: (b) => {
-      setTimeout(() => {
-        updateOption({ panicToggleEnabled: b });
-        import('/src/utils/utils.js').then(({ panic }) => panic());
-      }, 100);
-    },
-  },
-  5: {
-    name: 'Panic Shortcut',
-    desc: 'Set a keybind/shortcut that redirects you to a page when pressed.',
-    value: 'Set Key',
-    type: 'button',
-    action: openPanic,
-    disabled: !!!options.panicToggleEnabled,
-  },
-  6: {
     name: 'Stealth Cloak',
     desc: 'Hide DogeUB branding in the UI and apply a neutral tab identity for safer deployments.',
     value: !!options.stealthCloak,
@@ -83,6 +42,47 @@ export const privacyConfig = ({ options, updateOption, openPanic }) => ({
         import('/src/utils/utils.js').then(({ ckOff }) => ckOff());
       }, 100);
     },
+  },
+  3: {
+    name: 'Auto Cloak',
+    desc: 'Automatically apply the selected cloak when you switch tabs, restore original when you return.',
+    config: meta,
+    value: !!options.clkOff,
+    type: 'switch',
+    action: (b) => {
+      setTimeout(() => {
+        updateOption({ clkOff: b });
+        import('/src/utils/utils.js').then(({ ckOff }) => ckOff());
+      }, 100);
+    },
+    disabled: !options.tabName || options.tabName == meta[0].value.tabName,
+  },
+  4: {
+    name: 'Open in AB',
+    desc: 'This will open the site into an about:blank tab. Make sure popups are enabled.',
+    value: options.aboutBlank,
+    type: 'switch',
+    action: (b) => setTimeout(() => updateOption({ aboutBlank: b }), 100),
+  },
+  5: {
+    name: 'Panic Key',
+    desc: 'Enable or disable the panic key option.',
+    value: !!options.panicToggleEnabled,
+    type: 'switch',
+    action: (b) => {
+      setTimeout(() => {
+        updateOption({ panicToggleEnabled: b });
+        import('/src/utils/utils.js').then(({ panic }) => panic());
+      }, 100);
+    },
+  },
+  6: {
+    name: 'Panic Shortcut',
+    desc: 'Set a keybind/shortcut that redirects you to a page when pressed.',
+    value: 'Set Key',
+    type: 'button',
+    action: openPanic,
+    disabled: !!!options.panicToggleEnabled,
   },
 });
 

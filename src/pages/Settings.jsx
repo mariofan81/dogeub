@@ -11,7 +11,7 @@ const baseConfigs = [
   {
     name: 'Privacy',
     icon: HatGlasses,
-    keywords: ['title', 'cloak', 'cloaking', 'tab cloak', 'about', 'about:blank', 'blank'],
+    keywords: ['title', 'cloak', 'cloaking', 'tab cloak', 'about', 'about:blank', 'blank', 'stealth', 'deployment cloak', 'hide logo'],
     key: 'privacyConfig',
   },
   {
