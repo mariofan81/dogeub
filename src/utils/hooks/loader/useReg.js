@@ -53,7 +53,7 @@ export default function useReg() {
 
       const connection = new BareMuxConnection('/baremux/worker.js');
       isStaticBuild && setWispStatus('init');
-      let socket = isStaticBuild ? await returnWServer() : null;
+      const socket = isStaticBuild ? await returnWServer() : null;
       isStaticBuild && (!socket ? setWispStatus(false) : setWispStatus(true));
 
       const activeWisp =
@@ -63,15 +63,25 @@ export default function useReg() {
             ? socket
             : ws;
 
-      try {
-        await connection.setTransport('/libcurl/index.mjs', [{ wisp: activeWisp }]);
-      } catch (err) {
-        console.warn('libcurl transport failed, falling back to bare server transport:', err);
+      const transports = [
+        ...(!isStaticBuild ? [['/baremod/index.mjs', [bareServer], 'bare server']] : []),
+        ...(activeWisp ? [['/libcurl/index.mjs', [{ wisp: activeWisp }], 'libcurl+wisp']] : []),
+        ...(isStaticBuild ? [['/baremod/index.mjs', [bareServer], 'bare server']] : []),
+      ];
+
+      let initialized = false;
+      for (const [path, args, label] of transports) {
         try {
-          await connection.setTransport('/baremod/index.mjs', [bareServer]);
-        } catch (fallbackErr) {
-          console.error('Failed to initialize bare transports:', fallbackErr);
+          await connection.setTransport(path, args);
+          initialized = true;
+          break;
+        } catch (err) {
+          console.warn(`Transport init failed (${label}):`, err);
         }
+      }
+
+      if (!initialized) {
+        console.error('Failed to initialize all available proxy transports.');
       }
     };
 
